@@ -1,0 +1,10 @@
+{
+  "name": "silkyapp",
+  "version": "1.0.0",
+  "description": "App to test git repo features",
+  "repository": {
+    "type": "git",
+    "url": "?.git"
+  },
+  "author": "Richard Clarke <richardclarke1976@gmail.com>"
+}
