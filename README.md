@@ -1,3 +1,3 @@
-# Workflows Course
+# git repo test 
 
-This project is an example of workflow management for a lynda.com course.
+Simple test to check some new repo features
