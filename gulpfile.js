@@ -6,6 +6,24 @@ var gulp = require('gulp'),
     connect = require('gulp-connect'),
     concat = require('gulp-concat');
 
+var env,
+    coffeeSources,
+    jsSources,
+    sassSources,
+    htmlSources,
+    jsonSources,
+    outputDir,
+    sassStyle;
+    
+env = process.env.NODE_ENV || 'development';
+
+if (env==='development') {
+  outputDir = 'builds/development/';
+  //sassStyle = 'expanded'; // sassstyle not working unless set expertnally by a config file
+} else {
+  outputDir = 'builds/production/';
+  //sassStyle = 'compressed'; // sassstyle not working unless set expertnally by a config file
+}
 
 coffeeSources = ['components/coffee/tagline.coffee'];
 jsSources = [
@@ -15,6 +33,8 @@ jsSources = [
   'components/scripts/template.js'
 ];
 sassSources = ['components/sass/style.scss'];
+htmlSources = [outputDir + '*.html'];
+jsonSources = [outputDir +'js/*.json'];
 
 
 gulp.task('coffee', function() {
@@ -28,19 +48,19 @@ gulp.task('js', function() {
   gulp.src(jsSources)
     .pipe(concat('script.js'))
     .pipe(browserify())
-    .pipe(gulp.dest('builds/development/js'))
+    .pipe(gulp.dest(outputDir + 'js'))
     .pipe(connect.reload())
 });
 
 gulp.task('compass', function() {
   gulp.src(sassSources)
     .pipe(compass({
+      config_file: 'config.rb',
       sass: 'components/sass',
-      image: 'builds/development/images',
-      style: 'expanded'
+      image: outputDir + 'images'
     })
     .on('error', gutil.log))
-    .pipe(gulp.dest('builds/development/css'))
+    .pipe(gulp.dest(outputDir + 'css'))
     .pipe(connect.reload())
 });
 
@@ -48,13 +68,26 @@ gulp.task('watch', function() {
   gulp.watch(coffeeSources, ['coffee']);
   gulp.watch(jsSources, ['js']);
   gulp.watch('components/sass/*.scss', ['compass']);
+  gulp.watch(htmlSources, ['html']);
+  gulp.watch(jsonSources, ['json']);
 });
+
+gulp.task('html', function() {
+  gulp.src(htmlSources)
+    .pipe(connect.reload())
+});
+
+gulp.task('json', function() {
+  gulp.src(jsonSources)
+    .pipe(connect.reload())
+});
+
 
 gulp.task('connect', function() {
   connect.server({
-    root: 'builds/development',
+    root: outputDir,
     livereload: true
   });
 });
 
-gulp.task('default', ['coffee', 'js', 'compass', 'connect', 'watch']);
+gulp.task('default', ['html', 'json', 'coffee', 'js', 'compass', 'connect', 'watch']);
